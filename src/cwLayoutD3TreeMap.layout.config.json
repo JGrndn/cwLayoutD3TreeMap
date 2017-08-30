@@ -1,0 +1,17 @@
+{
+	"Name": "cw-layout-d3treemap",
+	"DisplayName": "D3 JS Tree Map",
+	"Description": "Display a short presentation",
+	"JavaScriptClassName": "cwLayoutD3TreeMap",
+	"Options": [{
+		"Id": "group-by-property",
+		"DisplayName": "Or Group by Property",
+		"Description": "Group the list by property value ",
+		"Type": 0
+	}, {
+		"Id": "size",
+		"DisplayName": "Size/Volume",
+		"Description": "Size or Volume, must be a number",
+		"Type": 0
+	}]
+}
