@@ -5,13 +5,28 @@
 	"JavaScriptClassName": "cwLayoutD3TreeMap",
 	"Options": [{
 		"Id": "group-by-property",
-		"DisplayName": "Or Group by Property",
-		"Description": "Group the list by property value ",
+		"DisplayName": "Group by Property",
+		"Description": "Check if you want to group objects using a property",
+		"Type": 1
+	}, {
+		"Id": "group-by-property-scriptname",
+		"DisplayName": "Group by Property (scriptname)",
+		"Description": "Set the scriptname of the property you want to group objects by",
 		"Type": 0
 	}, {
 		"Id": "size",
 		"DisplayName": "Size/Volume",
-		"Description": "Size or Volume, must be a number",
+		"Description": "Set the scriptname of the property used to determine Size or Volume. It must be an integer property",
+		"Type": 0
+	}, {
+		"Id": "navigation-node-id",
+		"DisplayName": "Open view for (node id)",
+		"Description": "Set the node id of object you want to open the view when double clicking (usually last node)",
+		"Type": 0
+	}, {
+		"Id": "color",
+		"DisplayName": "Color options",
+		"Description": "Set a json object specifying the property, the value and the color (ex: {\"property\":\"status\", \"values\":{\"t\":\"green\", \"d\":\"red\"}})",
 		"Type": 0
 	}]
 }
