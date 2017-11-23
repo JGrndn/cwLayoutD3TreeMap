@@ -2,7 +2,7 @@
 
 (function(cwApi, $) {
 	"use strict";
-	/*global cwAPI, jQuery */
+	/*global cwAPI, jQuery, d3 */
 
 	var cwLayoutD3TreeMap = function(options, viewSchema) {
 		cwApi.extend(this, cwApi.cwLayouts.CwLayout, options, viewSchema);
@@ -13,8 +13,7 @@
 		this.layoutsByNodeId = {};
 	};
 
-	cwLayoutD3TreeMap.drawOne = function(output, item, callback, nameOnly) {
-	};
+	cwLayoutD3TreeMap.drawOne = function(output, item, callback, nameOnly) {};
 
 	cwLayoutD3TreeMap.prototype.getObjectsByLookup = function(allItems) {
 		var groupData, sortedGroupData, filter, undefinedValue, undefinedText;
@@ -55,43 +54,44 @@
 
 	cwLayoutD3TreeMap.prototype.getLastNodeId = function() {
 		var n, nodes = this.viewSchema.NodesByID;
-		for(n in nodes){
-			if (nodes.hasOwnProperty(n)){
-				if (nodes[n].SortedChildren.length === 0){
+		for (n in nodes) {
+			if (nodes.hasOwnProperty(n)) {
+				if (nodes[n].SortedChildren.length === 0) {
 					return n;
 				}
 			}
 		}
 	};
 
-	cwLayoutD3TreeMap.prototype.getDisplayString = function(item){
-		var l, getDisplayStringFromLayout = function(layout){
-            return layout.displayProperty.getDisplayString(item);
-        };
-        if (item.nodeID === this.nodeID){
-            return this.displayProperty.getDisplayString(item);
-        }
-        if (!this.layoutsByNodeId.hasOwnProperty(item.nodeID)){
-            if (this.viewSchema.NodesByID.hasOwnProperty(item.nodeID)){
-                var layoutOptions = this.viewSchema.NodesByID[item.nodeID].LayoutOptions;
-                this.layoutsByNodeId[item.nodeID] = new cwApi.cwLayouts[item.layoutName](layoutOptions, this.viewSchema);
-            } else {
-                return item.name;
-            }
-        }
-        return getDisplayStringFromLayout(this.layoutsByNodeId[item.nodeID]);
+	cwLayoutD3TreeMap.prototype.getDisplayString = function(item) {
+		var getDisplayStringFromLayout = function(layout) {
+			return layout.displayProperty.getDisplayString(item);
+		};
+		if (item.nodeID === this.nodeID) {
+			return this.displayProperty.getDisplayString(item);
+		}
+		if (!this.layoutsByNodeId.hasOwnProperty(item.nodeID)) {
+			if (this.viewSchema.NodesByID.hasOwnProperty(item.nodeID)) {
+				this.layoutsByNodeId[item.nodeID] = new cwApi.cwLayouts[item.layoutName](this.viewSchema.NodesByID[item.nodeID].LayoutOptions, this.viewSchema);
+			} else {
+				return item.name;
+			}
+		}
+		return getDisplayStringFromLayout(this.layoutsByNodeId[item.nodeID]);
 	};
 
 	cwLayoutD3TreeMap.prototype.getLeaf = function(item, stopNodeId) {
-		var associationNode, data = {}, sizeProperty = this.options.CustomOptions['size'].toLowerCase(), i, o, p;
+		var associationNode, data = {},
+			sizeProperty = this.options.CustomOptions['size'].toLowerCase(),
+			i, o, p;
 		data.name = this.getDisplayString(item);
 		data.item = item;
 		data.cwlayout = this;
-		if (item.nodeID.toLowerCase() === this.options.CustomOptions['navigation-node-id'].toLowerCase()){
+		if (item.nodeID.toLowerCase() === this.options.CustomOptions['navigation-node-id'].toLowerCase()) {
 			data.url = cwApi.createLinkForSingleView(item.objectTypeScriptName, item);
-			if (item.properties.hasOwnProperty(this.colorOptions.property)){
+			if (item.properties.hasOwnProperty(this.colorOptions.property)) {
 				p = item.properties[this.colorOptions.property + '_abbreviation'].toLowerCase();
-				if (this.colorOptions.values.hasOwnProperty(p)){
+				if (this.colorOptions.values.hasOwnProperty(p)) {
 					data.color = this.colorOptions.values[p];
 				} else {
 					data.color = 'whitesmoke';
@@ -99,13 +99,13 @@
 			}
 		}
 
-		if (item.nodeID === stopNodeId || this.options.CustomOptions['group-by-property'] === true){
+		if (item.nodeID === stopNodeId || this.options.CustomOptions['group-by-property'] === true) {
 			data.value = item.properties[sizeProperty];
 		} else {
 			data.children = [];
-			for(associationNode in item.associations){
-				if (item.associations.hasOwnProperty(associationNode)){
-					for (i = 0; i < item.associations[associationNode].length; i+=1) {
+			for (associationNode in item.associations) {
+				if (item.associations.hasOwnProperty(associationNode)) {
+					for (i = 0; i < item.associations[associationNode].length; i += 1) {
 						o = item.associations[associationNode][i];
 						data.children.push(this.getLeaf(o, stopNodeId));
 					}
@@ -117,7 +117,7 @@
 
 	cwLayoutD3TreeMap.prototype.drawAssociations = function(output, associationTitleText, object) {
 		var data, objectId, associationTargetNode, endOfTreeNodeId, sortedItems, key, node, subItems, i, pgId,
-		propertyGroupSchema, objectTypeScriptName;
+			propertyGroupSchema, objectTypeScriptName;
 
 		if (cwApi.isUndefinedOrNull(object) || cwApi.isUndefined(object.associations)) {
 			// Is a creation page therefore a real object does not exist
@@ -136,14 +136,14 @@
 			}
 		}
 
-		if (this.options.CustomOptions['color'] != ''){
-			try{
+		if (this.options.CustomOptions['color'] != '') {
+			try {
 				this.colorOptions = JSON.parse(this.options.CustomOptions['color']);
-			}catch(err){
+			} catch (err) {
 				this.colorOptions = undefined;
 			}
 		}
-		
+
 		data = {
 			"name": "",
 			"children": []
@@ -151,14 +151,14 @@
 
 		endOfTreeNodeId = this.getLastNodeId();
 
-		if (this.options.CustomOptions['group-by-property'] === true){
+		if (this.options.CustomOptions['group-by-property'] === true) {
 			sortedItems = this.getObjectsByLookup(associationTargetNode);
 			for (key in sortedItems) {
 				node = {
 					"name": "",
 					"children": []
 				};
-			
+
 				node.name = key;
 				subItems = sortedItems[key];
 				if (subItems) {
@@ -168,9 +168,8 @@
 					data.children.push(node);
 				}
 			}
-		}
-		else{
-			for(i = 0; i<associationTargetNode.length; i+=1){
+		} else {
+			for (i = 0; i < associationTargetNode.length; i += 1) {
 				data.children.push(this.getLeaf(associationTargetNode[i], endOfTreeNodeId));
 			}
 		}
@@ -178,61 +177,55 @@
 
 
 		// display helptext if exists
-		for(pgId in this.mmNode.PropertiesGroups){
-			if (this.mmNode.PropertiesGroups.hasOwnProperty(pgId)){
+		for (pgId in this.mmNode.PropertiesGroups) {
+			if (this.mmNode.PropertiesGroups.hasOwnProperty(pgId)) {
 				propertyGroupSchema = cwApi.ViewSchemaManager.getPropertyGroup(this.viewSchema, pgId);
-        objectTypeScriptName = this.mmNode.ObjectTypeScriptName.toLowerCase();
-  			if (propertyGroupSchema.layout === 'helptext'){
+				objectTypeScriptName = this.mmNode.ObjectTypeScriptName.toLowerCase();
+				if (propertyGroupSchema.layout === 'helptext') {
 					cwApi.cwPropertiesGroups.displayPropertiesGroupFromKey(output, null, propertyGroupSchema, objectTypeScriptName);
 				}
 			}
 		}
 		output.push('<div class="cw-treemap" id="cw-treemap-', this.nodeID, '"></div>');
-		
+
 	};
 
 	cwLayoutD3TreeMap.prototype.createTreemap = function() {
 		var options = {};
 		d3.chart.treemap("#cw-treemap-" + this.nodeID, this.data, options);
 	};
-	cwLayoutD3TreeMap.prototype.applyJavaScript = function () {
-    if (cwApi.isUndefined(this.data)){
-    	return;
-    }
-    if(this.init) {
-      this.init = false;
-      if (!this.data)
-      	return;
-      var that = this;
-      var libsToLoad = ['modules/d3/d3.min.js'];
-            // AsyncLoad
-      cwApi.customLibs.aSyncLayoutLoader.loadUrls(libsToLoad,function(error){
-        if(error === null) {
-          libsToLoad = ['modules/d3/d3.treemap.js']; 
-            cwApi.customLibs.aSyncLayoutLoader.loadUrls(libsToLoad,function(error){
-              if(error === null) {
-                that.createTreemap(); 
-              } else {
-                cwAPI.Log.Error(error); 
-              }
-            });            
-          } else {
-            cwAPI.Log.Error(error);
-          }
-        });
-      }
-    };
 
-    cwLayoutD3TreeMap.prototype.openView = function(item) {
-    	var hash = cwApi.getSingleViewHash(item.objectTypeScriptName.toLowerCase(), item.object_id);
-    	cwApi.updateURLHash(hash);
-    };
+	cwLayoutD3TreeMap.prototype.applyJavaScript = function() {
+		if (cwApi.isUndefined(this.data)) {
+			return;
+		}
+		if (this.init) {
+			this.init = false;
+			if (!this.data){
+				return;
+			}
+			var that = this, libsToLoad = ['modules/d3/d3.min.js'];
+			// AsyncLoad
+			cwApi.customLibs.aSyncLayoutLoader.loadUrls(libsToLoad, function(error) {
+				if (error === null) {
+					that.createTreemap();
+				} else {
+					cwAPI.Log.Error(error);
+				}
+			});
+		}
+	};
+
+	cwLayoutD3TreeMap.prototype.openView = function(item) {
+		var hash = cwApi.getSingleViewHash(item.objectTypeScriptName.toLowerCase(), item.object_id);
+		cwApi.updateURLHash(hash);
+	};
 
 	cwLayoutD3TreeMap.prototype.openPopout = function(item) {
 		var popout = this.options.CustomOptions['navigation-popout'].toLowerCase();
-		if (popout){
-    		cwApi.cwDiagramPopoutHelper.openDiagramPopout(item, popout);
-    	}
+		if (popout) {
+			cwApi.cwDiagramPopoutHelper.openDiagramPopout(item, popout);
+		}
 	};
 
 	cwApi.cwLayouts.cwLayoutD3TreeMap = cwLayoutD3TreeMap;
