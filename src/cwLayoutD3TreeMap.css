@@ -1,1 +1,40 @@
-rect{fill:none;stroke:#fff}text{font:10px sans-serif}
+.cw-treemap {
+  width: 100%;
+  height: 600px;
+  background: #ddd;
+}
+.cw-treemap text {
+  pointer-events: none;
+}
+.cw-treemap .grandparent text {
+  font-weight: bold;
+  fill: #9da0a4;
+}
+.cw-treemap .grandparent:hover text {
+  fill: #95d4ce;
+}
+.cw-treemap rect {
+  fill: none;
+  stroke: #fff;
+}
+.cw-treemap rect.parent,
+.cw-treemap .grandparent rect {
+  stroke-width: 2px;
+}
+.cw-treemap .grandparent rect {
+  fill: #263238;
+}
+.cw-treemap .grandparent:hover rect {
+  fill: #B0BEC5;
+}
+.cw-treemap .children rect.parent,
+.cw-treemap .grandparent rect {
+  cursor: pointer;
+}
+.cw-treemap .children rect.parent {
+  fill: #bbb;
+  fill-opacity: .5;
+}
+.cw-treemap .children:hover rect.child {
+  fill: #bbb;
+}
